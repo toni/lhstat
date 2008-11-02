@@ -1,0 +1,13 @@
+lhstat collects and outputs some properties of a running linux.
+
+This is the first release, version 0.5, Sun Nov 02 01:32:44 GMT 2008
+
+Writing this was a way to learn some Lisp basics for the first time,
+and to solve the problem of monitoring some properties of my linux
+laptops. I use it in the window manager Awesome v2.3.4, but, given its
+text output, it shouldn't be too hard to reuse it in other window
+managers, or textual environments. I've been using it on daily basis
+for months on couple of different laptops. 
+
+Toni Prug, tony@irational.org
+
