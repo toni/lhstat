@@ -16,19 +16,16 @@
 (setf (slot-value *linux* 'sleep_sec) 3)
 (loop 
    (lhstat_checksystem *linux*)
-;;   (setf out (format nil "~A | ~A | ~A | ~A | ~A | ~A (~A) ~A%" 
-   (setf out (format nil "~A | ~A | ~A | ~A | ~A | ~A" 
-		     (slot-value *linux* 'cpu_temp_display_max)
-		     (slot-value *linux* 'load_display_max)
-		     (get-time)
-		     (slot-value *linux* 'storage_traffic_display_simple)
-		     (slot-value *linux* 'net_traffic_display)
-;;		     (slot-value *linux* 'remaining_time) 
-;;		     (slot-value *linux* 'status )
-;;		     (slot-value *linux* 'charge_percentage)))
-		     (slot-value *linux* 'power_display_simple)))
+   (setf lhstat_bar (format nil "~A | ~A | ~A | ~A | ~A | ~A" 
+				(slot-value *linux* 'cpu_temp_display_max)
+				(slot-value *linux* 'load_display_max)
+				(get-time)
+				(slot-value *linux* 'storage_traffic_display_simple)
+				(slot-value *linux* 'net_traffic_display)
+				(slot-value *linux* 'power_display_simple)))
    (run-shell-command
     (format nil "~A ~A ~A" 
-	    "echo \"0 widget_tell mybar tb_all text" out "\" |
+	    "echo \"0 widget_tell mybar tb_all text" lhstat_bar "\" |
 	    'awesome-client'"))
+   (format nil "~A" lhstat_bar)
    (sleep (slot-value *linux* 'sleep_sec)))
