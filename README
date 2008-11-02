@@ -7,7 +7,57 @@ and to solve the problem of monitoring some properties of my linux
 laptops. I use it in the window manager Awesome v2.3.4, but, given its
 text output, it shouldn't be too hard to reuse it in other window
 managers, or textual environments. I've been using it on daily basis
-for months on couple of different laptops. 
+for months on couple of different laptops (dual core and Pentium M). 
+
+Here's how the output looks like:
+
+"55C (64) | 0.14 (0.19) | 14:21 Sun 2 Nov | ^210k D       | ^154k (wlan0) 567k  | 2h:27m (Dis) 99%"
+
+It shows:
+
+1. CPU temperature, average for multicore
+
+   format: temp (max temp)
+
+2. system load
+
+   format: load (max load) 
+
+3. time date
+
+4. single storage device
+
+   format: read kB D write kB
+
+5. single network interface
+   
+   format: transmit kB (network interface name) receive kB
+
+6. battery
+
+   format: time left to end of status (battery status) percentage full
+
+   example of time to full discharge:          2h:26m (Dis) 98%  
+   example of calculating status:      Calibrating... (Ful) 97%
+   example of time to full charge:             0h:39m (Cha) 90%
+
+TODO: 
+
+- init file
+
+- debian package
+
+- calculation of storage and network stats needs checking
+
+- add debuging mode
+
+- command line interface needs to be added so that parameters like
+  storage device, network device, debuging mode, display mode of
+  various components, sleep time, can be selected
+
+- compile the code and run it compiled
+
+- create a lisp package
 
 Toni Prug, tony@irational.org
 

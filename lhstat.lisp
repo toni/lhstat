@@ -27,5 +27,5 @@
     (format nil "~A ~A ~A" 
 	    "echo \"0 widget_tell mybar tb_all text" lhstat_bar "\" |
 	    'awesome-client'"))
-   (format nil "~A" lhstat_bar)
+;;   (print (format nil "~A" lhstat_bar))
    (sleep (slot-value *linux* 'sleep_sec)))
