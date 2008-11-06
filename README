@@ -1,6 +1,6 @@
 lhstat collects and outputs some properties of a running linux.
 
-This is version 0.5.1, Mon Nov 03 00:58:00 GMT 2008.
+This is version 0.5.2, Thu Nov 06 01:59:42 GMT 2008
 
 Writing this was a way to learn some Lisp basics for the first time,
 and to solve the problem of monitoring some properties of my linux
@@ -45,9 +45,16 @@ It shows:
    example of calculating status:      Calibrating... (Ful) 97%
    example of time to full charge:             0h:39m (Cha) 90%
 
-TODO: 
+INSTALL and USE: 
 
-- init file
+if you check it out from git directly to /usr/local/sbin/ (or modify
+/etc/init.d/lhstat file to reflect your location) and make sure your
+system has clisp and detachtty (debian packages exists), you can now
+start/stop/restart it daemonized, using the provided init script. Log
+file will be at /var/log/lhstat.log. You can attach to the lhstat
+process with attachtty. I develop and test on Debian unstable.
+
+TODO: 
 
 - debian package
 
@@ -62,6 +69,10 @@ TODO:
 - compile the code and run it compiled
 
 - create a lisp package
+
+- add licence
+
+- add on screen warning for low battery status
 
 Toni Prug, tony@irational.org
 

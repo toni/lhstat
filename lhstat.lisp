@@ -9,8 +9,6 @@
 ;;
 ;; Toni Prug, tony@irational.org
 
-;;(si::use-fast-links nil)
- 
 (require "lib/utils.lisp")
 (require "lib/class.linux.lisp")
 (setf *linux* (make-instance 'linux))
