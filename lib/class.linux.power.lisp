@@ -3,6 +3,7 @@
 	 charge_full charge_full_design current_now voltage_now voltage_min_design 
 	 energy_now energy_full energy_full_design power_files_prefix power_display_simple
 	 technology present status type uevent charge_percentage remaining_time
+	 power_display_warning (power_status_critical :initform 0)
 	 (sys_power_path :accessor sys_power_path :initform "/sys/class/power_supply/")
 	 (battery_path :accessor battery_path ) power_files ))
 
@@ -13,9 +14,6 @@ used. This should take a list as an argument instead, which would
 solve the problem."
   ;; populate power object slots by reading each file inside the battery directory
   (lhstat_power_getattr (slot-value mypower 'power_files) mypower)
-;;  (print (format nil "energy_now: ~A" (slot-value mypower 'energy_now)))
-;;  (print (format nil "energy_full: ~A" (slot-value mypower 'energy_full)))
-;;  (print (format nil "energy_full_design: ~A" (slot-value mypower 'energy_full_design)))
   ;; on some systems, battery /sys files will have 'energy' prefix, on others 'change'
   (setf charge_full (intern (concatenate 'string (slot-value mypower 'power_files_prefix) "_FULL")))
   (setf charge_now  (intern (concatenate 'string (slot-value mypower 'power_files_prefix) "_NOW")))
@@ -32,7 +30,7 @@ solve the problem."
       ;; period, after which the value jumps to the expected
       ;; recharging level (355800 on my HP 8510w) - hence display
       ;; "Calibrating..." mode. Inaccurate, untill more data on this
-      ;; forthcoming.
+      ;; forthcoming, or a better solution found.
       (if (< (parse-integer (slot-value mypower 'current_now)) 600000)
 	    (setf (slot-value mypower 'remaining_time) "Calibrating...")
 	    (set-remaining-time mypower)))
@@ -40,7 +38,13 @@ solve the problem."
 	(format nil "~A (~A) ~A%" 
 		(slot-value mypower 'remaining_time)
 		(subseq (slot-value mypower 'status) 0 3)
-		(slot-value mypower 'charge_percentage))))
+		(slot-value mypower 'charge_percentage)))
+  (setf (slot-value mypower 'power_display_warning) 
+	(format nil "~A ~A%" 
+		(slot-value mypower 'remaining_time)
+		(slot-value mypower 'charge_percentage)))
+  (set-status-critical mypower))
+
 
 (defmethod lhstat_power_find (mypower)
   "Returns a path to the /sys directory containing power_supply stats
@@ -74,7 +78,17 @@ calculates some slots."
 	(directory (make-pathname :directory 
 				  (append (battery_path mypower)) :name "*")))
   ;; get all the stats
-  (lhstat_getpower mypower)) 
+  (lhstat_getpower mypower))
+
+(defmethod set-status-critical (mypower)
+  "Given a power object, set the power critical status if the charge
+falls under the designated percentage and if the power status is
+Dischcharging"
+   (if (< (slot-value mypower 'charge_percentage) 8)
+       (if (string= (slot-value mypower 'status) "Discharging")
+	   (setf (slot-value mypower 'power_status_critical) 1)
+	   (setf (slot-value mypower 'power_status_critical) 0))))
+
 
 (defmethod set-remaining-time (mypower)
   "Given a power object, set slots for the reamining hour, minutes, and

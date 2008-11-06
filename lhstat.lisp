@@ -9,22 +9,24 @@
 ;;
 ;; Toni Prug, tony@irational.org
 
+;; we'll supply selected_display on the command line, or even better
+;; on an open socket, which would alow for different displays, which
+;; means that detailed stats of various system components could be
+;; displayed (for example: with a shortcut to cycle through available
+;; displays). which means that a socket to which we print a display
+;; name could be a good idea.
+(setf selected_display "awesome.lisp")
+
+(require "lib/warnings.lisp")
 (require "lib/utils.lisp")
 (require "lib/class.linux.lisp")
 (setf *linux* (make-instance 'linux))
 (setf (slot-value *linux* 'sleep_sec) 3)
 (loop 
    (lhstat_checksystem *linux*)
-   (setf lhstat_bar (format nil "~A | ~A | ~A | ~A | ~A | ~A" 
-				(slot-value *linux* 'cpu_temp_display_max)
-				(slot-value *linux* 'load_display_max)
-				(get-time)
-				(slot-value *linux* 'storage_traffic_display_simple)
-				(slot-value *linux* 'net_traffic_display)
-				(slot-value *linux* 'power_display_simple)))
-   (run-shell-command
-    (format nil "~A ~A ~A" 
-	    "echo \"0 widget_tell mybar tb_all text" lhstat_bar "\" |
-	    'awesome-client'"))
-;;   (print (format nil "~A" lhstat_bar))
+   ;; not sure whether require is smart to not load unless missing
+   (require (concatenate 'string "display/" selected_display))
+   (display_stats *linux*)
+   (if (= (slot-value *linux* 'power_status_critical) 1)
+       (warning_low_battery *linux*))
    (sleep (slot-value *linux* 'sleep_sec)))
