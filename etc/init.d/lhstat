@@ -15,7 +15,7 @@ set -e
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/sbin
 NAME=lhstat
-DAEMON=/usr/local/sbin/lhstat.lisp
+DAEMON=/usr/local/sbin/lhstat/lhstat.lisp
 DETACHTTY=/usr/bin/detachtty
 LOGDIR=/var/log
 RUNDIR=/var/run

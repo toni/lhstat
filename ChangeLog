@@ -1,3 +1,9 @@
+2008-11-10  version 0.5.3 toni  <tony@irational.org>
+
+	* on-screen (osd_cat) and audio (festival) warnings for critical
+	battery level added. Debian packages are available: xosd-bin,
+	festival + festvox voices.
+
 2008-11-06 version 0.5.2 toni  <tony@irational.org>
 
 	* working init script added, README expanded with install and use

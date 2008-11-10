@@ -1,6 +1,8 @@
-lhstat collects and outputs some properties of a running linux.
+Lhstat collects and outputs some properties of a running Linux. It
+also runs visual (osd) and audio (festival) warnings for low battery
+status.
 
-This is version 0.5.2, Thu Nov 06 01:59:42 GMT 2008
+This is version 0.5.3, Mon Nov 10 18:19:57 GMT 2008
 
 Writing this was a way to learn some Lisp basics for the first time,
 and to solve the problem of monitoring some properties of my linux
@@ -11,9 +13,14 @@ for months on couple of different laptops (dual core and Pentium M).
 
 It is Inspired by Dobrica Pavlinusic's code dwm-status.pl
 (http://svn.rot13.org/index.cgi/scripts/view/trunk/dwm-status.pl)
-which performs the same thing, written in Perl.
+which performs a very similar thing, written in Perl.
 
-Here's how the output looks like:
+It happened on few occasions that a laptop would run out of battery
+power while i was in the house, but not close to it to see the power
+light blinking. Adding audio and visual warning features makes it less
+likely to miss the low battery warnings.
+
+Here's how the output of lhstat looks like:
 
 "55C (64) | 0.14 (0.19) | 14:21 Sun 2 Nov | ^210k D       | ^154k (wlan0) 567k  | 2h:27m (Dis) 99%"
 
@@ -47,12 +54,16 @@ It shows:
 
 INSTALL and USE: 
 
-if you check it out from git directly to /usr/local/sbin/ (or modify
-/etc/init.d/lhstat file to reflect your location) and make sure your
-system has clisp and detachtty (debian packages exists), you can now
-start/stop/restart it daemonized, using the provided init script. Log
-file will be at /var/log/lhstat.log. You can attach to the lhstat
-process with attachtty. I develop and test on Debian unstable.
+if you check it out from git directly to /usr/local/sbin/lhstat (or
+modify /etc/init.d/lhstat file to reflect your location) and make sure
+your system has clisp and detachtty (debian packages exists), you can
+now start/stop/restart it daemonized, using the provided init
+script. Log file will be at /var/log/lhstat.log. You can attach to the
+lhstat process with attachtty. For low battery warnings install the
+following: for on-screen visual osd_cat (xosd-bin in Debian), for
+audio festival (festival + festvox voice in Debian). I develop and
+test on Debian unstable, HP 8510 and Thinkpad X31, usually with the
+latest (or close to it), kernels.
 
 TODO: 
 
@@ -60,19 +71,32 @@ TODO:
 
 - calculation of storage and network stats needs checking
 
-- add debuging mode
+- debuging mode
 
 - command line interface needs to be added so that parameters like
   storage device, network device, debuging mode, display mode of
-  various components, sleep time, can be selected
+  various components, sleep time, can be selected. and so that version
+  and help can be displayed.
 
 - compile the code and run it compiled
 
-- create a lisp package
+- lisp package
 
 - add licence
 
-- add on screen warning for low battery status
+- check for existence of osd_cat and festival and log if either
+  missing
+
+- add version string and print it at the start, so that log contains a
+  stamp with the running version
+
+- tests
+
+- config file, to hold values like percentage threshold for displaying
+  low battery warnings, font in use by osd_cat
+
+- check and issue warning for minimal Linux kernel version, since
+  lhstat depends on /sys and /proc.
 
 Toni Prug, tony@irational.org
 
