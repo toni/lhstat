@@ -1,3 +1,8 @@
+2008-11-17  version 0.5.5 toni  <tony@irational.org>
+
+	* ability to change displays and polling timer via newly added
+	socket server
+
 2008-11-10  version 0.5.3 toni  <tony@irational.org>
 
 	* on-screen (osd_cat) and audio (festival) warnings for critical

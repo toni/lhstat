@@ -6,6 +6,6 @@
                       "echo \" battery C R I T I C A L ... " 
                       (slot-value linux 'power_display_warning) "\" | 
 osd_cat -p middle -A center -f -adobe-helvetica-bold-*-*-*-64-*-*-*-*-*-*-* -s 4 -d 2"))
-  (run-shell-command mycmd)
-  (run-shell-command mycmd2))
+  (run-shell-command mycmd))
+;;  (run-shell-command mycmd2))
 

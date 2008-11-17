@@ -15,18 +15,26 @@
 ;; displayed (for example: with a shortcut to cycle through available
 ;; displays). which means that a socket to which we print a display
 ;; name could be a good idea.
-(setf selected_display "awesome.lisp")
 
 (require "lib/warnings.lisp")
 (require "lib/utils.lisp")
 (require "lib/class.linux.lisp")
 (setf *linux* (make-instance 'linux))
 (setf (slot-value *linux* 'sleep_sec) 3)
-(loop 
-   (lhstat_checksystem *linux*)
-   ;; not sure whether require is smart to not load unless missing
-   (require (concatenate 'string "display/" selected_display))
-   (display_stats *linux*)
-   (if (= (slot-value *linux* 'power_status_critical) 1)
-       (warning_low_battery *linux*))
-   (sleep (slot-value *linux* 'sleep_sec)))
+(setf (slot-value *linux* 'selected_display) "awesome.lisp")
+
+(defun lhstat ()
+  (lhstat_checksystem *linux*)
+  (require (concatenate 'string "display/" (slot-value *linux* 'selected_display)))
+  (display_stats *linux*)
+  (if (= (slot-value *linux* 'power_status_critical) 1)
+      (warning_low_battery *linux*))
+  (sleep (slot-value *linux* 'sleep_sec)))
+
+(require "lib/socket.server.lisp")
+
+;;(defconstant *port* 9980)
+;;(defconstant *ip* "127.0.0.1")
+;;(start-server-with (*port* *ip*) lhstat)
+
+(start-server-with (9980 "127.0.0.1") lhstat)

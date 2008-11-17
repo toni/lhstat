@@ -87,7 +87,9 @@ Dischcharging"
    (if (< (slot-value mypower 'charge_percentage) 8)
        (if (string= (slot-value mypower 'status) "Discharging")
 	   (setf (slot-value mypower 'power_status_critical) 1)
-	   (setf (slot-value mypower 'power_status_critical) 0))))
+	   (setf (slot-value mypower 'power_status_critical) 0)))
+   (print (format nil "power_status_critical ~A" (slot-value mypower 'power_status_critical))))
+
 
 
 (defmethod set-remaining-time (mypower)

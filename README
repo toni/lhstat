@@ -2,7 +2,7 @@ Lhstat collects and outputs some properties of a running Linux. It
 also runs visual (osd) and audio (festival) warnings for low battery
 status.
 
-This is version 0.5.3, Mon Nov 10 18:19:57 GMT 2008
+This is version 0.5.5, Mon Nov 17 21:59:58 GMT 2008
 
 Writing this was a way to learn some Lisp basics for the first time,
 and to solve the problem of monitoring some properties of my linux
@@ -65,6 +65,35 @@ audio festival (festival + festvox voice in Debian). I develop and
 test on Debian unstable, HP 8510 and Thinkpad X31, usually with the
 latest (or close to it), kernels.
 
+Polling timer (default is 3sec) and display can be changed via a a
+local socket echo server. For now, socket defaults to 9980 port. You
+can connect with netcat for an interactive session, or send
+commands. Here are currently existing socket server commands with
+examples of usage:
+
+1. Connect, show connection details, disconnect:
+
+toni@mow1:~$ netcat 127.0.0.1 9980
+Welcome to clisp-echo LHSTAT server v.0.5.5
+> SHOWCONN
+#<IO BUFFERED SOCKET-STREAM CHARACTER 127.0.0.1:9980>   IO        IO
+> QUIT
+
+2. Upon connecting, change polling timer to 1 second:
+
+> conf:SLEEP_SEC=1
+Linux slot SLEEP_SEC set to value 1 
+
+3. set a new display without interactive session:
+
+toni@mow1:~$ echo "conf:SELECTED_DISPLAY=test.lisp" | netcat -q 5 127.0.0.1 9980
+Welcome to clisp-echo LHSTAT server v.0.5.5
+> Linux slot SELECTED_DISPLAY set to value test.lisp 
+
+4. shutdown lhnstat over the socket:
+
+toni@mow1:~$ echo "SHUTDOWN" | netcat -q 5 127.0.0.1 9980
+
 TODO: 
 
 - debian package
@@ -97,6 +126,14 @@ TODO:
 
 - check and issue warning for minimal Linux kernel version, since
   lhstat depends on /sys and /proc.
+
+- refactor and fix socket server macros
+
+- refactor linux class: move the formating of display strings out and
+  consider single linux class code file; maybe even loose classes and
+  go for hash tables intead
+
+- add some useful new displays for awesome status bar
 
 Toni Prug, tony@irational.org
 

@@ -8,7 +8,16 @@
 		     (load_max :initform 0) (reload_all :initform nil) 
 		     (load_path :accessor
 				load_path :initform "/proc/loadavg")
-		     sleep_sec))
+		     sleep_sec selected_display))
+
+(defmethod lhstat_configure (mylinux slot value) 
+  "Given a linux object, slot and value, sets slot to value on given
+linux object."
+  (setf myslot (intern slot))
+  (if (parse-integer value :junk-allowed t)
+      (setf (slot-value mylinux myslot) (parse-integer value))
+      (setf (slot-value mylinux myslot) value))
+  (print (format nil "Linux slot ~A set to value ~A" myslot (slot-value mylinux myslot))))
 
 (defmethod lhstat_checksystem (mylinux) 
   "Given a linux object, loads current state of its components."
