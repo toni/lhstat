@@ -1,9 +1,7 @@
 (require "class.linux.hd.lisp")
 
 (defclass storage () 
-  (storage_components 
-   storage_traffic storage_traffic_display 
-   storage_traffic_display_simple 
+  (storage_components storage_traffic  
    (storage_path :accessor storage_path :initform "/sys/block/")
    (hd_types :initform '("hd" "sd"))))
 
@@ -37,13 +35,4 @@ calculates slots."
 
 (defmethod lhstat_getstorage (mystorage)
   (dolist (myhd (slot-value mystorage 'storage_components))
-     (hd_collect_stats myhd (slot-value mystorage 'sleep_sec))
-     (setf (slot-value mystorage 'storage_traffic_display_simple)
-	   (format nil "^~4A D ~4A " 
-		   (unit (slot-value myhd 'hd_stat_r))
-		   (unit (slot-value myhd 'hd_stat_w))))
-     (setf (slot-value mystorage 'storage_traffic_display)
-	   (format nil "^~4A (~A) ~4A " 
-		   (unit (slot-value myhd 'hd_stat_r))
-		   (slot-value myhd 'hd_sys_name)
-		   (unit (slot-value myhd 'hd_stat_w))))))
+     (hd_collect_stats myhd (slot-value mystorage 'sleep_sec))))

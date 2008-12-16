@@ -2,8 +2,7 @@
 
 (defclass processing () 
   (cpu cpu_temp_average (cpu_temp_average_max :initform 0)
-       (cpu_path :accessor cpu_path :initform "/sys/devices/platform/")
-	cpu_temp_display cpu_temp_display_max cpu_temp_selected_display))
+       (cpu_path :accessor cpu_path :initform "/sys/devices/platform/")))
 
 (defmethod lhstat_getprocessing (myproc)
   "Calculate average temperature for all cpus, then set max tempterature and
@@ -21,15 +20,9 @@ display strings."
 		      (slot-value myproc 'cpu))))
       (setf (slot-value myproc 'cpu_temp_average) 
 	    (slot-value (first (slot-value myproc 'cpu)) 'cpu_temp)))
-  ;; Set Max and display strings
   (setf (slot-value myproc 'cpu_temp_average_max) 
 	(max (slot-value myproc 'cpu_temp_average) 
-	     (slot-value myproc 'cpu_temp_average_max)))
-  (setf (slot-value myproc 'cpu_temp_display)
-	(format nil "~AC" (slot-value myproc 'cpu_temp_average)))
-  (setf (slot-value myproc 'cpu_temp_display_max)
-	(format nil "~AC (~A)" (subseq (write-to-string (slot-value myproc 'cpu_temp_average)) 0 2)
-		(subseq (write-to-string (slot-value myproc 'cpu_temp_average_max)) 0 2)))) 
+	     (slot-value myproc 'cpu_temp_average_max))))
 
 (defmethod initialize-instance :after ((myproc processing) &key)
   "Upon initialization of a processing object, it automatically sets and
@@ -49,7 +42,7 @@ calculates slots."
 				 (split (format nil "~A" cpu_dir) 100 "/")))))
       (print (format nil "   + ~A" dir_name))
       (if (> (length dir_name) 7)
-	  (if (string= (subseq dir_name 0 8) "coretemp") ;; dual core HP 8510    
+	  (if (string= (subseq dir_name 0 8) "coretemp") ;; HP 8510, thinkpad x61    
 	      (progn
 		(print dir_name)
 		(setf mycpu (make-instance 'cpu))
@@ -57,9 +50,10 @@ calculates slots."
 		(setf (slot-value mycpu 'cpu_sys_name) dir_name)
 		(cpu_collect_stats mycpu)
 		(print (format nil "~A ~A" 
-			       (slot-value mycpu 'cpu_label) (slot-value mycpu 'cpu_temp)))
+			       (slot-value mycpu 'cpu_label) 
+			       (slot-value mycpu 'cpu_temp)))
 		(push mycpu collected_cpus) )))
-      (if (string= dir_name "thinkpad_hwmon") ;; thinkpad
+      (if (string= dir_name "thinkpad_hwmon") ;; thinkpad x31
 	  (progn
 	    (print dir_name)
 	    (setf mycpu (make-instance 'cpu))
@@ -67,6 +61,7 @@ calculates slots."
 	    (setf (slot-value mycpu 'cpu_sys_name) dir_name)
 	    (cpu_collect_stats mycpu)
 	    (print (format nil "(label) ~A : ~A" 
-			   (slot-value mycpu 'cpu_label) (slot-value mycpu 'cpu_temp)))
+			   (slot-value mycpu 'cpu_label) 
+			   (slot-value mycpu 'cpu_temp)))
 	    (push mycpu collected_cpus)))) 
    collected_cpus ))

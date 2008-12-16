@@ -1,9 +1,9 @@
 (defclass power () 
   (alarm serial_number manufacturer model_name charge_now remaining_min remaining_hour	 
 	 charge_full charge_full_design current_now voltage_now voltage_min_design 
-	 energy_now energy_full energy_full_design power_files_prefix power_display_simple
+	 energy_now energy_full energy_full_design power_files_prefix 
 	 technology present status type uevent charge_percentage remaining_time
-	 power_display_warning (power_status_critical :initform 0)
+	 (power_status_critical :initform 0)
 	 (sys_power_path :accessor sys_power_path :initform "/sys/class/power_supply/")
 	 (battery_path :accessor battery_path ) power_files ))
 
@@ -22,8 +22,9 @@ solve the problem."
 	(floor (* (divide-get-float (slot-value mypower charge_now) 
 			     (slot-value mypower charge_full_design)) 100)))
 ;;  (if (string= (slot-value mypower 'status) "Full")
-  (if (= (parse-integer (slot-value mypower charge_now))
-	 (parse-integer (slot-value mypower charge_full)))
+  (if (= (slot-value mypower 'charge_percentage) 100)
+;;   (if (= (parse-integer (slot-value mypower charge_now))
+;; 	 (parse-integer (slot-value mypower charge_full)))
       (setf (slot-value mypower 'remaining_time) "")
       ;; after plugging power supply in the laptop, current_now value
       ;; in /sys falls to 0 (or 4000, or 25000) for up to 50 seconds
@@ -31,18 +32,10 @@ solve the problem."
       ;; recharging level (355800 on my HP 8510w) - hence display
       ;; "Calibrating..." mode. Inaccurate, untill more data on this
       ;; forthcoming, or a better solution found.
-      (if (< (parse-integer (slot-value mypower 'current_now)) 600000)
-	    (setf (slot-value mypower 'remaining_time) "Calibrating...")
-	    (set-remaining-time mypower)))
-  (setf (slot-value mypower 'power_display_simple) 
-	(format nil "~A (~A) ~A%" 
-		(slot-value mypower 'remaining_time)
-		(subseq (slot-value mypower 'status) 0 3)
-		(slot-value mypower 'charge_percentage)))
-  (setf (slot-value mypower 'power_display_warning) 
-	(format nil "~A ~A%" 
-		(slot-value mypower 'remaining_time)
-		(slot-value mypower 'charge_percentage)))
+      (if (> (parse-integer (slot-value mypower 'current_now)) 0)
+	  (if (< (parse-integer (slot-value mypower 'current_now)) 600000)
+	      (setf (slot-value mypower 'remaining_time) "Calibrating...")
+	      (set-remaining-time mypower))))      
   (set-status-critical mypower))
 
 
@@ -113,12 +106,8 @@ remaining_time string for displaying."
 	     (- (parse-integer (slot-value mypower charge_full_design)) 
 		(parse-integer (slot-value mypower charge_now)))
 	     (slot-value mypower 'current_now) 6)))
-
   (setf (slot-value mypower 'remaining_hour) (floor remtime))
   (setf (slot-value mypower 'remaining_min)
-	(floor (* (- remtime (floor remtime)) 60)))
-  (setf (slot-value mypower 'remaining_time) 
-	(format nil "~Ah:~Am"  
-		(slot-value mypower 'remaining_hour)  
-		(slot-value mypower 'remaining_min))))
+	(floor (* (- remtime (floor remtime)) 60))))
+
 

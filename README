@@ -2,7 +2,7 @@ Lhstat collects and outputs some properties of a running Linux. It
 also runs visual (osd) and audio (festival) warnings for low battery
 status.
 
-This is version 0.5.5, Mon Nov 17 21:59:58 GMT 2008
+This is version 0.5.6, Tue Dec 16 10:14:14 GMT 2008
 
 Writing this was a way to learn some Lisp basics for the first time,
 and to solve the problem of monitoring some properties of my linux
@@ -62,8 +62,8 @@ script. Log file will be at /var/log/lhstat.log. You can attach to the
 lhstat process with attachtty. For low battery warnings install the
 following: for on-screen visual osd_cat (xosd-bin in Debian), for
 audio festival (festival + festvox voice in Debian). I develop and
-test on Debian unstable, HP 8510 and Thinkpad X31, usually with the
-latest (or close to it), kernels.
+test on Debian unstable, HP 8510w and Thinkpad X61, usually with the
+latest stable (or close to it), kernels.
 
 Polling timer (default is 3sec) and display can be changed via a a
 local socket echo server. For now, socket defaults to 9980 port. You
