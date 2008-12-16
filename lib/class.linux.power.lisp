@@ -54,7 +54,11 @@ for the Battery supply. Accepts power object."
       (setf power_type
 	    (read-oneline-file (make-pathname :directory (append power_dir) :name "type"))) 
       (if (string= power_type "Battery")               ;; when you find Battery
-	  (return-from lhstat_power_find power_dir)))) ;; return path
+	  (progn
+	    (if (probe-file (make-pathname :directory (append power_dir) :name "charge_now"))
+		(setf (slot-value mypower 'power_files_prefix) "CHARGE")
+		(setf (slot-value mypower 'power_files_prefix) "ENERGY"))
+	    (return-from lhstat_power_find power_dir))))) ;; return path
 
 (defmethod lhstat_power_getattr (files mypower) 
   "Given a list of file paths to Linux /sys power_supply attributes,
@@ -73,6 +77,7 @@ names) of the object to the content of files."
 calculates some slots."
   ;; find a battery power source
   (setf (slot-value mypower 'battery_path) (lhstat_power_find mypower))
+  (print (format nil "+ found battery at ~A " (slot-value mypower 'battery_path)))
   ;; collect all the files/attributes
   (setf (slot-value mypower 'power_files)
 	(directory (make-pathname :directory 
