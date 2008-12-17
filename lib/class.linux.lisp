@@ -40,10 +40,12 @@ from the main loop."
 	(format nil "~A (~A)" (slot-value mylinux 'load_current)
 		(slot-value mylinux 'load_max)))
   ;; remaining time
-  (setf (slot-value mylinux 'remaining_time) 
-	(format nil "~Ah:~Am"  
-		(slot-value mylinux 'remaining_hour)  
-		(slot-value mylinux 'remaining_min)))
+  (if (= (slot-value mylinux 'power_calibrating_mode) 0)
+      (progn
+	(setf (slot-value mylinux 'remaining_time) 
+	      (format nil "~Ah:~Am"  
+		      (slot-value mylinux 'remaining_hour)  
+		      (slot-value mylinux 'remaining_min)))))
   ;; power
   (setf (slot-value mylinux 'power_display_simple) 
 	(format nil "~A (~A) ~A%" 

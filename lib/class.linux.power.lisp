@@ -2,11 +2,11 @@
   (alarm serial_number manufacturer model_name charge_now remaining_min remaining_hour	 
 	 charge_full charge_full_design current_now voltage_now voltage_min_design 
 	 energy_now energy_full energy_full_design power_files_prefix 
+	 (power_status_full :initform 0)
 	 technology present status type uevent charge_percentage remaining_time
-	 (power_status_critical :initform 0)
+	 (power_status_critical :initform 0) (power_calibrating_mode :initform 0)
 	 (sys_power_path :accessor sys_power_path :initform "/sys/class/power_supply/")
 	 (battery_path :accessor battery_path ) power_files ))
-
 
 (defmethod lhstat_getpower (mypower)
   "No point in collecting it all when only couple of stats are
@@ -21,23 +21,24 @@ solve the problem."
   (setf (slot-value mypower 'charge_percentage)
 	(floor (* (divide-get-float (slot-value mypower charge_now) 
 			     (slot-value mypower charge_full_design)) 100)))
-;;  (if (string= (slot-value mypower 'status) "Full")
   (if (= (slot-value mypower 'charge_percentage) 100)
-;;   (if (= (parse-integer (slot-value mypower charge_now))
-;; 	 (parse-integer (slot-value mypower charge_full)))
-      (setf (slot-value mypower 'remaining_time) "")
-      ;; after plugging power supply in the laptop, current_now value
-      ;; in /sys falls to 0 (or 4000, or 25000) for up to 50 seconds
-      ;; period, after which the value jumps to the expected
-      ;; recharging level (355800 on my HP 8510w) - hence display
-      ;; "Calibrating..." mode. Inaccurate, untill more data on this
-      ;; forthcoming, or a better solution found.
-      (if (> (parse-integer (slot-value mypower 'current_now)) 0)
-	  (if (< (parse-integer (slot-value mypower 'current_now)) 600000)
-	      (setf (slot-value mypower 'remaining_time) "Calibrating...")
-	      (set-remaining-time mypower))))      
+      ;; status: FULL
+      (power-full mypower)
+      (progn
+	;; status: NOT FULL
+	(setf (slot-value mypower 'power_status_full) 0)
+	(if (< (parse-integer (slot-value mypower 'current_now)) 600000)
+	    ;; status: CALIBRATING
+	    ;; after plugging power supply in the laptop, current_now value in /sys
+	    ;; falls to 0 (or 4000, or 25000) for up to 50 seconds period, after which
+	    ;; the value jumps to the expected recharging level (355800 on my HP
+	    ;; 8510w) - hence display "Calibrating..." mode. Inaccurate, for now.
+	    (remaining-time-calibrating mypower)
+	    ;; NOT FULL and NOT CALIBRATING
+	    (progn
+	      (setf (slot-value mypower 'power_calibrating_mode) 0)
+	      (set-remaining-time mypower)))))
   (set-status-critical mypower))
-
 
 (defmethod lhstat_power_find (mypower)
   "Returns a path to the /sys directory containing power_supply stats
@@ -88,11 +89,24 @@ Dischcharging"
 	   (setf (slot-value mypower 'power_status_critical) 0)))
    (print (format nil "power_status_critical ~A" (slot-value mypower 'power_status_critical))))
 
+(defmethod power-full (mypower)
+  "Given a power object, sets reamining time slots for FULL case."
+  (setf (slot-value mypower 'power_status_full) 1)
+  (setf (slot-value mypower 'remaining_time) "")
+  (setf (slot-value mypower 'remaining_hour) "")
+  (setf (slot-value mypower 'remaining_min) ""))
 
+(defmethod remaining-time-calibrating (mypower)
+  "Given a power object, sets reamining time slots for CALIBRATING case."
+  (setf (slot-value mypower 'power_calibrating_mode) 1)
+  (setf (slot-value mypower 'remaining_time) "Calibrating ... ")
+  (setf (slot-value mypower 'remaining_hour) "")
+  (setf (slot-value mypower 'remaining_min) ""))
 
 (defmethod set-remaining-time (mypower)
   "Given a power object, set slots for the reamining hour, minutes, and
 remaining_time string for displaying."
+  (setf (slot-value mypower 'power_calibrating_mode) 0)
   (setf charge_full_design  (intern (concatenate 'string (slot-value mypower 'power_files_prefix) "_FULL_DESIGN")))
   (setf charge_now  (intern (concatenate 'string (slot-value mypower 'power_files_prefix) "_NOW")))
   (print (format nil "current_now: ~A" (slot-value mypower 'current_now)))
