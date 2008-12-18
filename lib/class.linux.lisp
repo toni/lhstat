@@ -40,7 +40,8 @@ from the main loop."
 	(format nil "~A (~A)" (slot-value mylinux 'load_current)
 		(slot-value mylinux 'load_max)))
   ;; remaining time
-  (if (= (slot-value mylinux 'power_calibrating_mode) 0)
+  (if (and (= (slot-value mylinux 'power_calibrating_mode) 0)
+	   (= (slot-value mylinux 'power_status_full) 0))
       (progn
 	(setf (slot-value mylinux 'remaining_time) 
 	      (format nil "~Ah:~Am"  
