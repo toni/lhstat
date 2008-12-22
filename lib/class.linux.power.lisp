@@ -47,12 +47,11 @@ for the Battery supply. Accepts power object."
   (dolist (power_dir (dir-list (sys_power_path mypower))) ;; all power_supply options
       (setf power_type
 	    (read-oneline-file (make-pathname :directory (append power_dir) :name "type"))) 
-      (if (string= power_type "Battery")               ;; when you find Battery
-	  (progn
+      (when (string= power_type "Battery")               ;; when you find Battery
 	    (if (probe-file (make-pathname :directory (append power_dir) :name "charge_now"))
 		(setf (slot-value mypower 'power_files_prefix) "CHARGE")
 		(setf (slot-value mypower 'power_files_prefix) "ENERGY"))
-	    (return-from lhstat_power_find power_dir))))) ;; return path
+	    (return-from lhstat_power_find power_dir)))) ;; return path
 
 (defmethod lhstat_power_getattr (files mypower) 
   "Given a list of file paths to Linux /sys power_supply attributes,

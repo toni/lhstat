@@ -40,13 +40,12 @@ from the main loop."
 	(format nil "~A (~A)" (slot-value mylinux 'load_current)
 		(slot-value mylinux 'load_max)))
   ;; remaining time
-  (if (and (= (slot-value mylinux 'power_calibrating_mode) 0)
+  (when (and (= (slot-value mylinux 'power_calibrating_mode) 0)
 	   (= (slot-value mylinux 'power_status_full) 0))
-      (progn
 	(setf (slot-value mylinux 'remaining_time) 
 	      (format nil "~Ah:~Am"  
 		      (slot-value mylinux 'remaining_hour)  
-		      (slot-value mylinux 'remaining_min)))))
+		      (slot-value mylinux 'remaining_min))))
   ;; power
   (setf (slot-value mylinux 'power_display_simple) 
 	(format nil "~A (~A) ~A%" 
@@ -107,8 +106,7 @@ from the main loop."
 
 (defmethod lhstat_set_reloads (mylinux) 
   "Given a linux object, sets reload slots for all components."
-  (if (slot-value mylinux 'reload_all)
-      (progn 
+  (when (slot-value mylinux 'reload_all)
 	(setf (slot-value mylinux 'reload_processing) reload_all)
-	(setf (slot-value mylinux 'reload_power) reload_all)))) 
+	(setf (slot-value mylinux 'reload_power) reload_all)))
 
