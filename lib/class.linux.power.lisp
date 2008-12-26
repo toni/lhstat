@@ -42,13 +42,16 @@ solve the problem."
 
 (defmethod lhstat_power_find (mypower)
   "Returns a path to the /sys directory containing power_supply stats
-for the Battery supply. Accepts power object."
+for the Battery supply."
   (setf (slot-value mypower 'power_files_prefix) "CHARGE")
-  (dolist (power_dir (dir-list (sys_power_path mypower))) ;; all power_supply options
+  (dolist (power_dir (dir-list (sys_power_path mypower))) 
+    ;; all power_supply options
       (setf power_type
-	    (read-oneline-file (make-pathname :directory (append power_dir) :name "type"))) 
-      (when (string= power_type "Battery")               ;; when you find Battery
-	    (if (probe-file (make-pathname :directory (append power_dir) :name "charge_now"))
+	    (read-oneline-file (make-pathname 
+				:directory (append power_dir) :name "type"))) 
+      (when (string= power_type "Battery") ;; Battery found
+	    (if (probe-file (make-pathname 
+			     :directory (append power_dir) :name "charge_now"))
 		(setf (slot-value mypower 'power_files_prefix) "CHARGE")
 		(setf (slot-value mypower 'power_files_prefix) "ENERGY"))
 	    (return-from lhstat_power_find power_dir)))) ;; return path
@@ -92,13 +95,15 @@ Dischcharging"
   "Given a power object, sets reamining time slots for FULL case."
   (setf (slot-value mypower 'power_status_full) 1)
   (setf (slot-value mypower 'remaining_time) "")
-  (setf (slot-value mypower 'remaining_hour) "")
-  (setf (slot-value mypower 'remaining_min) ""))
+  (power-empty-rem-hourmin mypower))
 
 (defmethod remaining-time-calibrating (mypower)
   "Given a power object, sets reamining time slots for CALIBRATING case."
   (setf (slot-value mypower 'power_calibrating_mode) 1)
   (setf (slot-value mypower 'remaining_time) "Calibrating ... ")
+  (power-empty-rem-hourmin mypower))
+
+(defmethod power-empty-rem-hourmin (mypower)
   (setf (slot-value mypower 'remaining_hour) "")
   (setf (slot-value mypower 'remaining_min) ""))
 
