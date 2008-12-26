@@ -20,16 +20,11 @@ calculates slots."
     (dolist (store_dir (dir-list (storage_path mystorage))) ;; all storage
       (setf dir_name (car (last (butlast 
 				 (split (format nil "~A" store_dir) 100 "/")))))
-;;      (print dir_name)
-      (if (= (length dir_name) 3)
+      (when (= (length dir_name) 3)
 	  (dolist (store_type (slot-value mystorage 'hd_types))
 	    (print (format nil "~A ~A" store_type (subseq dir_name 0 2)))
 	    (when (string= (subseq dir_name 0 2) store_type) ;; is it hd storage?
-		(print (format nil "+ found ~A" dir_name))   
-		(setf myhd (make-instance 'hd))
-		(setf (slot-value myhd 'hd_location) store_dir)
-		(setf (slot-value myhd 'hd_sys_name) dir_name)
-		(push myhd collected_storage) ))))
+		(push (lhstat_make_hd store_dir dir_name) collected_storage) ))))
     collected_storage ))
 
 (defmethod lhstat_getstorage (mystorage)
