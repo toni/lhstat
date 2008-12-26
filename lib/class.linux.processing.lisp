@@ -33,19 +33,6 @@ calculates slots."
 ;;  (print (format nil "CPU list: ~A" 
 ;;		 (slot-value (first (slot-value myproc 'cpu)) 'cpu_temp))))
 
-(defun lhstat_make_cpu_coretemp ((cpu_dir string) (dir_name string))
-  "Returns a cpu object"
-  (let  ((mycpu))
-    (print dir_name)
-    (setf mycpu (make-instance 'cpu))
-    (setf (slot-value mycpu 'cpu_location) cpu_dir)
-    (setf (slot-value mycpu 'cpu_sys_name) dir_name)
-    (cpu_collect_stats mycpu)
-     (print (format nil "~A ~A" 
-		    (slot-value mycpu 'cpu_label) 
-		    (slot-value mycpu 'cpu_temp)))
-  mycpu))
-
 (defmethod lhstat_cpu_find (myproc)
   "Returns list of cpu objects, with stats collected."
   (print "+ looking for cpus")
@@ -54,9 +41,8 @@ calculates slots."
       (setf dir_name (car (last (butlast 
 				 (split (format nil "~A" cpu_dir) 100 "/")))))
       (print (format nil "   + ~A" dir_name))
-      (when
-	(or (and (> (length dir_name) 7)
-		 (string= (subseq dir_name 0 8) "coretemp")) ;; HP 8510, thinkpad x61    
-	    (string= dir_name "thinkpad_hwmon"))             ;; thinkpad x31
-	(push (lhstat_make_cpu_coretemp cpu_dir dir_name) collected_cpus)))
+      (when (or (and (> (length dir_name) 7)
+		     (string= (subseq dir_name 0 8) "coretemp")) ;; HP 8510, thinkpad x61    
+		(string= dir_name "thinkpad_hwmon"))             ;; thinkpad x31
+	(push (lhstat_make_cpu cpu_dir dir_name) collected_cpus)))
     collected_cpus))
